@@ -1,4 +1,5 @@
-from subprocess import DEVNULL, STDOUT, Popen, getoutput, check_output, check_call, PIPE, call, run as _run
+from subprocess import DEVNULL, STDOUT, CalledProcessError, Popen, getoutput, check_output, check_call, PIPE, call, run as _run
+import subprocess
 from traceback import TracebackException
 
 def printEx(e):
@@ -18,13 +19,33 @@ def silent_run(command, **kawrgs):
         print(f"Silent_run error:\n", command)
         printEx(ex)
 
-def loud_run(command, **kawrgs):
+def loud_run(command, **kwargs):
     command = [str(i) for i in command]
-    try:
-        return check_call(command, **kawrgs)
-    except Exception as ex:
-        print(f"loud_run error:\n", command)
-        printEx(ex)
+    result = subprocess.run(command, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True, **kwargs)
+    if (result.stderr and "WARN" not in result.stderr): # sox produces warnings when something is loud
+                                                        # >sox WARN bass: bass clipped 61440 samples; decrease volume?
+                                                        # >sox WARN dither: dither clipped 53754 samples; decrease volume?
+
+        raise Exception(result.stderr)
+    else:
+        return result
+
+# def loud_run_old2(command, **kwargs):
+#     command = [str(i) for i in command]
+#     try:
+#         result = subprocess.run(command, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True, **kwargs)
+#         if (result.stderr): raise Exception(result.stderr)
+#         return result
+#     except Exception as ex:
+#         print(f"loud_run error:\n", command)
+
+# def loud_run_old(command, **kawrgs):
+#     command = [str(i) for i in command]
+#     try:
+#         return check_call(command, **kawrgs)
+#     except CalledProcessError as ex:
+#         print(f"loud_run error:\n", command)
+#         print("problem: ", ex.output)
 
 def getout(command, **kawrgs):
     return _run(command, text = True, stdout = PIPE, **kawrgs).stdout.strip()

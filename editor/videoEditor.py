@@ -1104,7 +1104,7 @@ def videoEdit(originalFile, args, workingDir = "./", resourceDir = path.dirname(
             tryToDeleteFile(originalFile)
             tryToDeleteDir(newFileDir)
             
-        return result(False, "", "An unknown error has occured!")
+        return result(False, "", "An error occurred trying to process your video.\n```{0}```".format(ex))
 
 # if __name__ == "__main__":
 #     if len(sys.argv) == 1:

@@ -289,10 +289,13 @@ async def prepare_concat(msg, args):
     
     return targets
 
-def process_result_post(msg, res, filename = "video.mp4", prefix = None, random_message = True):
+def process_result_post(msg, res, filename = "video.mp4", prefix = None, random_message = True, autotuneCMD = False):
     if res.success:
-        text = random.choice(response_messages) if random_message else res.message
-        content = f"{prefix.strip()} ║ {text.strip()}" if prefix else text.strip()
+        if autotuneCMD:
+            content = "Couldn't apply autotune (command does not run on Unix servers)"
+        else:
+            text = random.choice(response_messages) if random_message else res.message
+            content = f"{prefix.strip()} ║ {text.strip()}" if prefix else text.strip()
         messageQue.append(qued_msg(context = msg, filepath = res.filename, filename = hash_filename(filename), message = content, reply = True))
     else:
         messageQue.append(qued_msg(context = msg, message = res.message, reply = True))
@@ -365,6 +368,10 @@ async def parse_command(message):
     if is_timeout is not True:
         await message.reply(f"Please wait {ceil(is_timeout)} seconds to use this command again.")
         return
+    
+    autotuneCMD = False
+    
+    if ("autotune" in original_msg.lower()): autotuneCMD = True
 
     match final_command_name:
         case "help":
@@ -419,10 +426,11 @@ async def parse_command(message):
                     parse = lambda x: {
                         "result": x,
                         "filename": x.filename}),
-                Action(process_result_post, message, swap_arg("result"), swap_arg("filename"), remainder,
+                Action(process_result_post, message, swap_arg("result"), swap_arg("filename"), remainder, autotuneCMD=autotuneCMD,
                     name = "VEB Post"),
                 async_handler = async_runner,
-                persist_result_values = True
+                persist_result_values = True,
+                
             ).run_threaded()
             
 botReady = False
