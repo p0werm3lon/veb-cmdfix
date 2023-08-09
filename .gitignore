@@ -1,8 +1,7 @@
 config.json
-*__pycache__
 cookies.txt
 active/*
-
 venv/
-
-hi.mp4
+**/.DS_Store
+*__pycache__
+.vscode/
