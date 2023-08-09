@@ -291,7 +291,7 @@ async def prepare_concat(msg, args):
 
 def process_result_post(msg, res, filename = "video.mp4", prefix = None, random_message = True, autotuneCMD = False):
     if res.success:
-        if autotuneCMD:
+        if autotuneCMD and sys.platform is not 'win32':
             content = "Couldn't apply autotune (command does not run on Unix servers)"
         else:
             text = random.choice(response_messages) if random_message else res.message
