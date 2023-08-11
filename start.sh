@@ -1,3 +1,4 @@
+cd veb # Legitimately I have never wrote a bash script in my life until now
 source venv/bin/activate
 
 # Make tmp/
