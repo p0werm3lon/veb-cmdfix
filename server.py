@@ -59,7 +59,4 @@ def clearTmp():
         elif os.path.isdir(file_path):
             os.rmdir(file_path)
 
-if __name__ == '__main__':
-    app.run(port=8738)
-
 clearTmp()
