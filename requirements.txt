@@ -1,5 +1,6 @@
 # Surely everything will work the exact same forever and ever
 
+flask
 ffprobe-python
 ffmpeg-python
 discord.py
