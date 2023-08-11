@@ -297,39 +297,19 @@ def process_result_post(msg, res, filename = "video.mp4", prefix = None, random_
     else:
         messageQue.append(qued_msg(context = msg, message = res.message, reply = True))
 
-async def parse_command(message):
-    if (message.author.id == bot.user.id and not '║' in message.content) or (message.author.bot and message.author.id != bot.user.id):
-        return
-
-    original_msg = message.content
-    msg = message.content.split('║', 1)[0]
+async def parse_command(input):
+    msg = input.split('║', 1)[0]
     if len(msg) == 0: return
     
-    try:
-        is_reply_to_bot = message.reference and (await message.channel.fetch_message(message.reference.message_id)).author.id == bot.user.id
-    except discord.errors.NotFound:
-        is_reply_to_bot = False
-
-    if message.author.id != bot.user.id and not is_reply_to_bot and msg.split('>>')[0].removeprefix('!').strip() == "":
-        return
-    
-    has_meta_prefix = is_reply_to_bot
     append_space = ' ' if ' ' in msg else ''
-    for pre in meta_prefixes:
+    for pre in meta_prefixes: # defined by config["meta_prefixes"]
         if msg.startswith(pre + append_space):
             has_meta_prefix = True
-            msg = msg.removeprefix(pre).lstrip()
+            msg = msg.removeprefix(pre).lstrip() # .removeprefix() is a python function on string for some reason
             break
     
     cmd_name_opts = ["concat", "combine", "download", "downloader", "destroy"]
-    
-    author_id = str(message.author.id)
-    
-    chain_limit = 9999 if message.author.id == bot.user.id else (
-        user_timeout_durations[author_id]["max_chain"] if (
-            author_id in user_timeout_durations and "max_chain" in user_timeout_durations[author_id]
-        ) else command_chain_limit
-    )
+
     
     command, *remainder = msg.split(">>")[:chain_limit]
     if command.startswith('!'):
@@ -361,48 +341,36 @@ async def parse_command(message):
     if not final_command_name:
         return
 
-    is_timeout = apply_timeouts(message, cmd, guild_timeout_durations, user_timeout_durations, guild_timeouts, user_timeouts)
-    if is_timeout is not True:
-        await message.reply(f"Please wait {ceil(is_timeout)} seconds to use this command again.")
-        return
-
     match final_command_name:
-        case "help":
-            if 'veb' in original_msg:
-                await message.reply("VideoEditBot Command Documentation: https://github.com/GanerCodes/videoEditBot/blob/master/COMMANDS.md")
-        case "hat":
-            embed = discord.Embed(title = 'hat', description = 'hat')
-            embed.set_image(url = "https://cdn.discordapp.com/attachments/748021401016860682/920801735147139142/5298188282_1639606638167.png")
-            await message.reply("Hat", embed=embed)
-        case "concat":
-            Task(
-                Action(prepare_concat, message, args,
-                    name = "Concat Command Prep",
-                    check = lambda x: x),
-                Action(download_discord_attachments, swap_arg("result"), generate_uuid_folder_from_msg(message.id),
-                    name = "Download videos to Concat",
-                    check = lambda x: x),
-                Action(combiner, swap_arg("result"), (concat_filename := f"{generate_uuid_folder_from_msg(message.id)}.mp4"),
-                    SILENCE = "./editor/SILENCE.mp3",
-                    print_info = False,
-                    name = "Concat Videos",
-                    fail_action = Action(
-                        lambda n, e: messageQue.append(
-                            qued_msg(
-                                context = message,
-                                message = "Sorry, something went wrong during concatenation.",
-                                reply = True)))),
-                Action(process_result_post, message, result(True, concat_filename, ""), concat_filename, remainder,
-                    name = "Post Concat"),
-                async_handler = async_runner
-            ).run_threaded()
-        case "download":
-            Task(
-                Action(download,
-                    download_filename := f"{generate_uuid_folder_from_msg(message.id)}.mp4",
-                    args, name="yt-dlp download", file_limit=FILE_SIZE_LIMIT_MB),
-                Action(process_result_post, message, swap_arg("result"), download_filename,
-                    remainder, name="Post Download"),).run_threaded()
+        # case "concat":
+        #     Task(
+        #         Action(prepare_concat, message, args,
+        #             name = "Concat Command Prep",
+        #             check = lambda x: x),
+        #         Action(download_discord_attachments, swap_arg("result"), generate_uuid_folder_from_msg(message.id),
+        #             name = "Download videos to Concat",
+        #             check = lambda x: x),
+        #         Action(combiner, swap_arg("result"), (concat_filename := f"{generate_uuid_folder_from_msg(message.id)}.mp4"),
+        #             SILENCE = "./editor/SILENCE.mp3",
+        #             print_info = False,
+        #             name = "Concat Videos",
+        #             fail_action = Action(
+        #                 lambda n, e: messageQue.append(
+        #                     qued_msg(
+        #                         context = message,
+        #                         message = "Sorry, something went wrong during concatenation.",
+        #                         reply = True)))),
+        #         Action(process_result_post, message, result(True, concat_filename, ""), concat_filename, remainder,
+        #             name = "Post Concat"),
+        #         async_handler = async_runner
+        #     ).run_threaded()
+        # case "download":
+        #     Task(
+        #         Action(download,
+        #             download_filename := f"{generate_uuid_folder_from_msg(message.id)}.mp4",
+        #             args, name="yt-dlp download", file_limit=FILE_SIZE_LIMIT_MB),
+        #         Action(process_result_post, message, swap_arg("result"), download_filename,
+        #             remainder, name="Post Download"),).run_threaded()
         case "destroy":
             Task(
                 Action(prepare_VideoEdit, message,

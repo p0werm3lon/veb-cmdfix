@@ -1,4 +1,4 @@
-from time import time
+from time        import time, sleep
 import sys, ffmpeg
 
 from collections import namedtuple
@@ -954,7 +954,7 @@ def edit(file, groupData, par, workingDir = "", resourceDir = "..", toVideo = Fa
 
 V, S = float, str
 
-def videoEdit(originalFile, args, workingDir = "./", resourceDir = path.dirname(__file__), disallowTimecodeBreak = False, keepExtraFiles = False, SHOW_TIMER = False, HIDE_FFMPEG_OUT = True, HIDE_ALL_FFMPEG = True, fixPrint = fixPrint, durationUnder = None, allowRandom = True, logErrors = False):
+def videoEdit(originalFile, args, workingDir = "./tmp/", resourceDir = path.dirname(__file__), disallowTimecodeBreak = False, keepExtraFiles = False, SHOW_TIMER = False, HIDE_FFMPEG_OUT = True, HIDE_ALL_FFMPEG = True, fixPrint = fixPrint, durationUnder = None, allowRandom = True, logErrors = False):
     oldArgs = args
     par = {
         "vbr"           :[V, "vbr" , round(r(0, 100)) ],
