@@ -187,7 +187,7 @@ def timecodeBreak(file, m):
     new = open(file, 'wb')
     new.write(byteData)
 
-def edit(file, groupData, par, workingDir = "", resourceDir = "..", toVideo = False, toGif = False, disallowTimecodeBreak = False, HIDE_FFMPEG_OUT = True, HIDE_ALL_FFMPEG = True, SHOW_TIMER = False, fixPrint = fixPrint):
+def edit(file, groupData, par, workingDir = "", resourceDir = "..", toVideo = False, toGif = False, disallowTimecodeBreak = False, HIDE_FFMPEG_OUT = False, HIDE_ALL_FFMPEG = True, SHOW_TIMER = False, fixPrint = fixPrint):
     videoFX = ['playreverse', 'hmirror', 'vmirror', 'lag', 'rlag', 'shake', 'fisheye', 'zoom', 'bottomtext', 'toptext', 'normalcaption', 'topcap', 'bottomcap', 'topcaption', 'bottomcaption', 'hypercam', 'bandicam', 'deepfry', 'contrast', 'hue', 'hcycle', 'speed', 'vreverse', 'areverse', 'reverse', 'wscale', 'hscale', 'sharpen', 'watermark', 'framerate', 'invert', 'wave', 'waveamount', 'wavestrength', 'acid', 'hcrop', 'vcrop', 'hflip', 'vflip']
     audioFX = ['pitch', 'reverb', 'earrape', 'bass', 'mute', 'threshold', 'crush', 'wobble', 'music', 'sfx', 'volume', 'autotune']
 
@@ -1104,7 +1104,7 @@ def videoEdit(originalFile, args, workingDir = "./tmp/", resourceDir = path.dirn
             tryToDeleteFile(originalFile)
             tryToDeleteDir(newFileDir)
             
-        return result(False, "", "An unknown error has occured!")
+        return result(False, "", ex)
 
 # if __name__ == "__main__":
 #     if len(sys.argv) == 1:

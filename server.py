@@ -21,6 +21,9 @@ def edit_handler():
     try:
         result = editor(file, args)
 
+        if (result.success == False): 
+            return f'{result.message}', 500
+
         with open(result.filename, 'rb') as f:
             contents = f.read()
 
